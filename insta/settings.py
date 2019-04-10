@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ["myinstagram-firebattt.c9users.io",]
 # Application definition
 
 INSTALLED_APPS = [
+    'bootstrap4',
     'django_extensions',
     'django.contrib.admin',
     'django.contrib.auth',
