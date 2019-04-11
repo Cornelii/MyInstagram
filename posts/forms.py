@@ -14,5 +14,5 @@ class PostModelForm(forms.ModelForm):
     # 2. To set propertiesof corresponding inputs.
     class Meta:
         model = Post
-        fields = ["content"]
-    
+        fields = ["content", 'image']
+
