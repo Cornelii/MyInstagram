@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ["myinstagram-firebattt.c9users.io",]
 # Application definition
 
 INSTALLED_APPS = [
+    'imagekit',
     'bootstrap4',
     'django_extensions',
     'django.contrib.admin',
