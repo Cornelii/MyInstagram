@@ -4,20 +4,30 @@
   <div class="row justify-content-center">
   
     {% for post in posts %}
-          <div class="card" style="width: 10rem;">
-            {% if post.image %}
-              <img src="{{post.image.url}}" class="card-img-top" alt="...">
-            {% else %}
-              <img src="https://picsum.photos/200/200/?random" class="card-img-top" alt="...">
-            {% endif %}
+          <div class="card" style="width: 15rem;">
+              <div class="card-header">
+                <span>{{ post.user.username }}</span>
+              </div>
+              
+              {% if post.image %}
+                <img src="{{post.image.url}}" class="card-img-top" alt="...">
+              {% else %}
+                <img src="https://picsum.photos/200/200/?random" class="card-img-top" alt="...">
+              {% endif %}
+
             
             <div class="card-body">
               <p class="card-text">{{post.content}}</p>
-              <form method="POST" action = "{% url 'posts:delete' post.id %}">
-                {% csrf_token %}
-                <button class="btn btn-danger">삭제</button>
-              </form>
-              <a href="{% url 'posts:update' post.id %}" class="btn btn-success">수정</a>
+              
+              <!-- 작성자만 수정/삭제 가능  -->
+              {% if post.user == request.user  %}
+                <form method="POST" action = "{% url 'posts:delete' post.id %}" class="d-inline-block">
+                  {% csrf_token %}
+                  <button class="btn btn-danger">삭제</button>
+                </form>
+                <a href="{% url 'posts:update' post.id %}" class="btn btn-success">수정</a>
+              {% endif%}
+              
             </div>
           </div>
     {% endfor %}
