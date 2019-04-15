@@ -63,3 +63,17 @@ def update(request, post_id):
         })
 
 
+
+def like(request, post_id):
+    # 1. retrieve the post
+    post = get_object_or_404(Post, id=post_id)
+    
+    #post.like_users.add(request.User)
+    # 2. If user already like this post. Undo (Remove Like)
+    if request.User in post.like_users.all():
+        post.like_users.remove(request.User)
+    else:
+    # 3. If user did not like this post yet. Like
+        post.like_users.add(request.User)
+    
+    return redirect('posts:list')
