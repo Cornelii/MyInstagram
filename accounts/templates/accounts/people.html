@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+
+{% block body %}
+
+<div class="container">
+  <h2>{{ people.username }}</h2>
+  <div class="row">
+    {% for post in people.post_set.all %}
+    
+      {% if post.image  %}
+      <div class="col-4">
+        <img src="{{ post.image.url }}" class="img-fluid"></img>
+      </div>
+      {% endif  %}
+    {% endfor  %}
+  </div>
+</div>
+
+
+{% endblock %}

@@ -4,12 +4,14 @@ from django.urls import path, include
 #upload setting
 from django.conf.urls.static import static
 from django.conf import settings
-
+from accounts import views as accounts_views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/asdf/', admin.site.urls),
     path('posts/', include('posts.urls')),
     path('accounts/', include('accounts.urls')),
+    path('<str:username>', accounts_views.people, name="people"),
+    
 ]
 
 
