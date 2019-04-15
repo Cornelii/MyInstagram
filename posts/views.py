@@ -12,6 +12,8 @@ def create(request):
         # post를 DB에 적용.
         form = PostModelForm(request.POST, request.FILES)
         if form.is_valid():
+            post = form.save(commit=False)
+            post.user = request.user
             form.save()
             return redirect('posts:list')
         else:
