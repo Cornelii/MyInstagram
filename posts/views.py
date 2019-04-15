@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 
 from .forms import PostModelForm
 from .models import Post
@@ -63,17 +64,17 @@ def update(request, post_id):
         })
 
 
-
+@login_required
 def like(request, post_id):
     # 1. retrieve the post
     post = get_object_or_404(Post, id=post_id)
     
     #post.like_users.add(request.User)
     # 2. If user already like this post. Undo (Remove Like)
-    if request.User in post.like_users.all():
-        post.like_users.remove(request.User)
+    if request.user in post.like_users.all():
+        post.like_users.remove(request.user)
     else:
     # 3. If user did not like this post yet. Like
-        post.like_users.add(request.User)
+        post.like_users.add(request.user)
     
     return redirect('posts:list')
