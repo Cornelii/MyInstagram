@@ -44,6 +44,33 @@
               </p>
             </div>
             
+            {% load bootstrap4 %}
+            
+            <div class="card-body">
+              <!-- ModelForm about comment -->
+              
+              <form method = "POST" action={% url 'posts:comment_create' post.id %}>
+                {% csrf_token  %}
+                <!-- bootstrap form  -->
+                {% bootstrap_form comment_form  %}
+                <button class="btn btn-primary" type="submit">댓글 남기기</button>
+                
+              </form>
+              
+              <!-- 해당글에 작성된 댓글을 모두 출력  -->
+              {% for com in post.comments.all  %}
+                <div class="card-text d-inline">
+                  <strong>{{com.user.username}}</strong>: {{com.content}}
+                </div>
+                <a href="{% url 'posts:comment_delete' post.id com.id %}"><i class="fas fa-trash-alt"></i></a>
+                <hr class="m-1 p-0">
+                {% empty  %}
+                <p>댓글이 없습니다.</p>
+                
+              {% endfor %}
+            
+            </div>
+            
           </div>
     {% endfor %}
   

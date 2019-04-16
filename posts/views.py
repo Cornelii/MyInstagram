@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 
-from .forms import PostModelForm
-from .models import Post
+from .forms import PostModelForm, CommentModelForm
+from .models import Post, Comment
 # Create your views here.
 
 
@@ -25,14 +25,18 @@ def create(request):
             "form":form
         })
 
+
 def list(request):
     # Show all the posts.
     posts = Post.objects.all()
-    context = {
-        'posts':posts
-    }
-    return render(request,'posts/list.html',context)
     
+    context = {
+        'posts':posts,
+        'comment_form':CommentModelForm()
+    }
+    return render(request,'posts/list.html', context)
+
+
 @require_POST
 def delete(request, post_id):
     post = get_object_or_404(Post, id=post_id)
@@ -80,3 +84,27 @@ def like(request, post_id):
         post.like_users.add(request.user)
     
     return redirect('posts:list')
+    
+    
+@login_required
+@require_POST
+def comment_create(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    form = CommentModelForm(request.POST)
+    if form.is_valid():
+        com = form.save(commit=False)
+        com.post = post
+        com.user = request.user
+        form.save()
+        return redirect('posts:list')
+
+
+@login_required
+def comment_delete(request, post_id, comment_id):
+    com = get_object_or_404(Comment, id=comment_id)
+    post = get_object_or_404(Post, id=post_id)
+    if request.user == com.user or request.user == post.user:
+        com.delete()
+    return redirect('posts:list')
+    
+    

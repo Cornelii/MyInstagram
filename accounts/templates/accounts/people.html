@@ -9,9 +9,11 @@
     {% for post in people.post_set.all %}
     
       {% if post.image  %}
-      <div class="col-4">
-        <img src="{{ post.image.url }}" class="img-fluid"></img>
-      </div>
+      <a href="#">
+        <div class="col-4">
+          <img src="{{ post.image.url }}" class="img-fluid"></img>
+        </div>
+      </a>
       {% endif  %}
     {% endfor  %}
   </div>
