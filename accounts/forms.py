@@ -1,8 +1,9 @@
-from django.forms import ModelForm
+from django.contrib.auth.forms import UserChangeForm
+from django.contrib.auth import get_user_model
+# from django.contrib.auth.model
 
-
-class SignUp(ModelForm):
-    pass
-    
+class CustomUserChangeForm(UserChangeForm):
     class Meta:
-        pass
+        model = get_user_model()
+        fields = ('username', 'email','last_name','first_name')
+
