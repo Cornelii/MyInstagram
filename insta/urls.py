@@ -5,8 +5,10 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 from accounts import views as accounts_views
+from posts import views as posts_views
 
 urlpatterns = [
+    path('', posts_views.list, name='root'),
     path('admin/asdf/', admin.site.urls),
     path('posts/', include('posts.urls')),
     path('accounts/', include('accounts.urls')),

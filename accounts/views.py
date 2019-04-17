@@ -4,14 +4,17 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm, PasswordChangeForm
-from .forms import CustomUserChangeForm
+from .forms import CustomUserChangeForm, ProfileForm
 
 from django.contrib.auth import get_user_model
 
 from django.contrib.auth import update_session_auth_hash
+from .models import Profile
 
+from django.core.exceptions import ObjectDoesNotExist
 # Create your views here.
 
+from IPython import embed
 
 def login(request):
     
@@ -45,12 +48,14 @@ def logout(request):
     auth_logout(request)
     return redirect('posts:list')
 
+
 def signup(request):
     
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            Profile.objects.create(user=user)  ## 동시에 1:1 레코드 생기도록.
             auth_login(request, user)
             return redirect('posts:list')
     else:
@@ -72,15 +77,29 @@ def people(request, username):
 def update(request):
     if request.method == "POST":
         user_change_form = CustomUserChangeForm(request.POST, instance=request.user)
-        if user_change_form.is_valid():
+        
+        profile_form = ProfileForm(request.POST, instance=request.user.profile)
+
+        if user_change_form.is_valid() and profile_form.is_valid():
             user = user_change_form.save()
+            profile_form.save()
             #user = user_change_form.get_user()
             
             return redirect('people', user.username)
     else:
         user_change_form = CustomUserChangeForm(instance=request.user)
+        profile, created = Profile.objects.get_or_create(user=request.user)
+        
+        profile_form = ProfileForm(instance=request.user.profile)
+        
+        # if hasattr(request.user, 'profile'):
+        #     profile_form = ProfileForm(instance=request.user.profile)
+        # else:
+        #     profile_form = Profile.objects.create(user=request.user)
+        
         return render(request, 'accounts/update.html', {
             'user_change_form':user_change_form,
+            'profile_form':profile_form
         })
 
 
