@@ -18,9 +18,9 @@ class PostModelForm(forms.ModelForm):
 
 
 class CommentModelForm(forms.ModelForm):
-    content = forms.CharField(label='댓글', widget = forms.TextInput(
+    content = forms.CharField(label='', widget = forms.TextInput(
         attrs={
-            'placeholder':"Leave your comment~!"
+            'placeholder':"댓글 달기..."
             
         }))
     

@@ -1,31 +1,166 @@
 {% extends 'base.html' %}
+{% load static  %}
+
+{% block title  %}
+{{people.username}} Myinstagram
+{% endblock  %}
 
 {% block body %}
 
-<div class="container">
-  <h2>{{ people.username }}</h2>
+<link rel="stylesheet" href="{% static 'accounts/css/style.css' %}" type="text/css" />
+
+<hr>
+
+<div class="row">
+  <div class="col-3">
+    <i class="far fa-user-circle"></i>
+  </div>
+  <div class="col-9">
+    <div class="row">
+      <div class="col-2">
+        <h2>{{ people.username }}</h2>
+      </div>
+      <div class="col-2">
+        {% if request.user in people.followed_by.all %}
+          <a class = "btn btn-light " href="{% url 'accounts:follow' people.id %}">팔로잉</a>
+        {% else %}
+          <a class = "btn btn-light" href="{% url 'accounts:follow' people.id %}">팔로우</a>
+        {% endif  %}
+      </div>
+      <div class="col-2">
+        {% if user == people %}
+          <a href="{% url 'accounts:update' %}" class="btn btn-light">프로필 편집</a>
+        {% endif  %}
+      </div>
+    </div>
+    
+    <div class="row">
+      <div class="col-2">게시물 {{people.post_set.count}}</div>
+      <div class="col-2">팔로우 {{people.followings.count}}</div>
+      <div class="col-2">팔로워 {{people.followed_by.count}}</div>
+    </div>
+    <div class="row">
+      <p>{{people.last_name}}  {{people.first_name}}</p>
+      <p>{{people.profile.nickname}}</p>
+      <p>{{people.profile.description}}</p>
+    </div>
+  </div>
   
-  <p>{{people.last_name}}  {{people.first_name}}</p>
-  <p>{{people.profile.nickname}}</p>
-  <p>{{people.profile.description}}</p>
+</div>
+    
+<hr>
+  
+<div>
+
+  
   {% if user == people %}
-  <a href="{% url 'accounts:update' %}" class="btn btn-info">회원정보 수정</a>
   <a href="{% url 'accounts:password' %}" class="btn btn-info">비밀번호 변경</a>
   <a href="{% url 'accounts:delete' %}" class="btn btn-danger">회원탈퇴 </a>
   {% endif  %}
-  <div class="row">
+  
+  
+  <div class="card-columns mt-3">
     {% for post in people.post_set.all %}
     
       {% if post.image  %}
-      <a href="#">
-        <div class="col-4">
-          <img src="{{ post.image.url }}" class="img-fluid"></img>
+      <div class="card" data-toggle="modal" data-target="#modal{{post.id}}">
+            <img src="{{ post.image.url }}" class="img-fluid card-img-top"></img>
+      </div>
+      
+      <!-- Modal -->
+
+      <div class="modal fade" id="modal{{post.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content m-0 p-0">
+            <div class="modal-body m-0 p-0">
+              <div class="conatiner-fluid h-100">
+                <div class="row h-100">
+                  <div class="col d-flex align-items-center">
+                    
+                    <!-- Image Part  -->
+                    <img src="{{ post.image.url }}" class="img-fluid m-0 p-0"></img>
+                    
+                  </div>
+                  <div class="col">
+                    <!-- Content Part  -->
+                    <div class="row">
+                      <div>
+                      <i class="far fa-user-circle"></i>
+                      </div>
+                      <div>
+                      <strong>{{post.user.username}}</strong>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <p>{{post.content}}</p>
+                    </div>
+                    
+                    <div class="row">
+                      <a href="{% url 'posts:like' post.id %}">
+                        <!-- 해당유저가 like를 했으면   -->
+                        {% if user in post.like_users.all %}
+                          <i class="fas fa-heart"></i>
+                        {% else %}
+                        <!-- 아니면  -->
+                          <i class="far fa-heart"></i>
+                        {% endif %}
+                      </a>
+                      <a href="#"><i class="far fa-comment-alt"></i></a>
+                      <a href="#"><i class="far fa-share-square"></i></a>
+                      
+                      <p class="card-text">
+                        좋아요 {{post.like_users.count}}개
+                      </p>
+                    </div>
+                    
+                    <!-- 해당글에 작성된 댓글을 모두 출력  -->
+                    {% for com in post.comments.all  %}
+                      <div>
+                        <strong>{{com.user.username}}</strong>: {{com.content}}
+                        <!--<a href="{% url 'posts:like' post.id %}">-->
+                           <!--해당유저가 like를 했으면   -->
+                        <!--  {% if user in post.like_users.all %}-->
+                        <!--    <i class="fas fa-heart"></i>-->
+                        <!--  {% else %}-->
+                           <!--아니면  -->
+                        <!--    <i class="far fa-heart"></i>-->
+                        <!--  {% endif %}-->
+                        <!--</a>-->
+                        
+                        <a href="{% url 'posts:comment_delete' post.id com.id %}"><i class="fas fa-trash-alt"></i></a>
+                      </div>
+                    {% endfor %}
+                      
+                      
+                        {% load bootstrap4  %}
+                        <!-- ModelForm about comment -->
+                      <div class="container-fluid">
+                        <form method = "POST" action={% url 'posts:comment_create' post.id %}>
+                          {% csrf_token  %}
+                            <div class="col">
+                              <!-- bootstrap form  -->
+                              {% bootstrap_form comment_form  %}
+                          </div>
+                        </form>
+                      </div>
+                      
+
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </a>
+      </div>
+
       {% endif  %}
     {% endfor  %}
+    
   </div>
+
 </div>
 
-
+<script type="text/javascript" src="{% static 'accounts/js/script.js' %}"></script>
 {% endblock %}
+

@@ -1,83 +1,146 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block body %}
+{% block title  %}
+{{user.username}} Myinstagram
+{% endblock  %}
 
-  <div class="row justify-content-center">
+
+{% block body %}
+  <link rel="stylesheet" href="{% static 'posts/css/style.css' %}" type="text/css" />
   
-    {% for post in posts %}
-          <div class="card" style="width: 20rem;">
-              <div class="card-header">
-                <span>{{ post.user.username }}</span>
+  <div class="row justify-content-center">
+    <div class="col-8">
+      {% for post in posts %}
+            <div class="card m-2" style="width: 40rem;">
+                <div class="card-header d-flex justify-content-between">
+                  <strong>{{ post.user.username }}</strong>
+                  <a href="#"><i class="fas fa-ellipsis-h"></i></a>
+                </div>
+                
+                {% if post.image %}
+                  <img src="{{post.image.url}}" class="card-img-top user_image" alt="...">
+                {% else %}
+                  <img src="https://picsum.photos/200/200/?random" class="card-img-top" alt="...">
+                {% endif %}
+  
+              
+              <div class="card-body">
+                <p class="card-text">{{post.content}}</p>
+                
+                <!-- 작성자만 수정/삭제 가능  -->
+                {% if post.user == request.user  %}
+                  <form method="POST" action = "{% url 'posts:delete' post.id %}" class="d-inline-block">
+                    {% csrf_token %}
+                    <button class="btn btn-danger">삭제</button>
+                  </form>
+                  <a href="{% url 'posts:update' post.id %}" class="btn btn-success">수정</a>
+                {% endif%}
+              </div>
+              <!--좋아요 버튼 추가-->
+              <div class="card-body">
+                
+                <a href="{% url 'posts:like' post.id %}">
+                  <!-- 해당유저가 like를 했으면   -->
+                  {% if user in post.like_users.all %}
+                    <i class="fas fa-heart"></i>
+                  {% else %}
+                  <!-- 아니면  -->
+                    <i class="far fa-heart"></i>
+                  {% endif %}
+                </a>
+                <a href="#"><i class="far fa-comment-alt"></i></a>
+                <a href="#"><i class="far fa-share-square"></i></a>
+                
+                <p class="card-text">
+                  좋아요 {{post.like_users.count}}개
+                </p>
               </div>
               
-              {% if post.image %}
-                <img src="{{post.image.url}}" class="card-img-top" alt="...">
-              {% else %}
-                <img src="https://picsum.photos/200/200/?random" class="card-img-top" alt="...">
-              {% endif %}
-
-            
-            <div class="card-body">
-              <p class="card-text">{{post.content}}</p>
+              {% load bootstrap4 %}
               
-              <!-- 작성자만 수정/삭제 가능  -->
-              {% if post.user == request.user  %}
-                <form method="POST" action = "{% url 'posts:delete' post.id %}" class="d-inline-block">
-                  {% csrf_token %}
-                  <button class="btn btn-danger">삭제</button>
+              <div class="card-body m-0 p-0">
+                <!-- 해당글에 작성된 댓글을 모두 출력  -->
+                {% for com in post.comments.all  %}
+                  <div class="card-text m-1 p-0 d-flex justify-content-between">
+                    <div>
+                      <strong>{{com.user.username}}</strong>: {{com.content}}
+                    </div>
+                    <div>
+                      <!--<a href="{% url 'posts:like' post.id %}">-->
+                        <!-- 해당유저가 like를 했으면   -->
+                      <!--  {% if user in post.like_users.all %}-->
+                      <!--    <i class="fas fa-heart"></i>-->
+                      <!--  {% else %}-->
+                        <!-- 아니면  -->
+                      <!--    <i class="far fa-heart"></i>-->
+                      <!--  {% endif %}-->
+                      <!--</a>-->
+                      
+                      <a href="{% url 'posts:comment_delete' post.id com.id %}"><i class="fas fa-trash-alt"></i></a>
+                    </div>
+                  </div>
+                  
+                  
+                  {% empty  %}
+                  <p>댓글이 없습니다.</p>
+                  
+                {% endfor %}
+                
+                <!-- ModelForm about comment -->
+                
+                <form method = "POST" action={% url 'posts:comment_create' post.id %}>
+                  {% csrf_token  %}
+                  <div class="row">
+                    <div class="col-10">
+                      <!-- bootstrap form  -->
+                      {% bootstrap_form comment_form  %}
+                    </div>
+                    <div class="col-2">
+                      <div type='submit' class="btn btn-primary">게시</div>
+                    </div>
+                  </div>
                 </form>
-                <a href="{% url 'posts:update' post.id %}" class="btn btn-success">수정</a>
-              {% endif%}
-            </div>
-            <!--좋아요 버튼 추가-->
-            <div class="card-body">
-              <a href="{% url 'posts:like' post.id %}">
-                <!-- 해당유저가 like를 했으면   -->
-                {% if user in post.like_users.all %}
-                  <i class="fas fa-heart"></i>
-                {% else %}
-                <!-- 아니면  -->
-                  <i class="far fa-heart"></i>
-                {% endif %}
-              </a>
-              <p class="card-text">
-                {{post.like_users.count}}명이 좋아합니다.
-              </p>
-            </div>
-            
-            {% load bootstrap4 %}
-            
-            <div class="card-body">
-              <!-- ModelForm about comment -->
-              
-              <form method = "POST" action={% url 'posts:comment_create' post.id %}>
-                {% csrf_token  %}
-                <!-- bootstrap form  -->
-                {% bootstrap_form comment_form  %}
-                <button class="btn btn-primary" type="submit">댓글 남기기</button>
                 
-              </form>
-              
-              <!-- 해당글에 작성된 댓글을 모두 출력  -->
-              {% for com in post.comments.all  %}
-                <div class="card-text d-inline">
-                  <strong>{{com.user.username}}</strong>: {{com.content}}
-                </div>
-                <a href="{% url 'posts:comment_delete' post.id com.id %}"><i class="fas fa-trash-alt"></i></a>
-                <hr class="m-1 p-0">
-                {% empty  %}
-                <p>댓글이 없습니다.</p>
                 
-              {% endfor %}
-            
+              
+              </div>
+              
             </div>
+      {% endfor %}
+    
             
+      
+    </div>
+    
+    <!-- User List  -->
+    <div class="col-xl-3 m-0">
+      <div class="personal_info">
+        <div class="row">
+          <div class="col-3">
+            <i class="far fa-user-circle"></i>
           </div>
-    {% endfor %}
-  
+          <div class="col-4">
+            {{user.username}}
+            {{user.profile.nickname}}
+          </div>
+        </div>
+        <div class="row personal_info_content">
+          <div class="title">스토리</div>
+          
+          <div>회워님이 팔로우하는 사람들의 스토리가 여기에 표시됩니다.</div>
+          
+        </div>
+        <div class="row">
+          
+          
+        </div>
+      </div>
+    </div>
+    
+    
   </div>  
   
-  <script src={% static 'js/script1.js' %}></script>
+  <script src="{% static 'posts/js/script1.js' %}"></script>
 {% endblock %}
 

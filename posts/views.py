@@ -28,7 +28,7 @@ def create(request):
 
 def list(request):
     # Show all the posts.
-    posts = Post.objects.all()
+    posts = Post.objects.all().order_by('-created')
     
     context = {
         'posts':posts,
