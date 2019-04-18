@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+
 
 from .forms import PostModelForm, CommentModelForm
 from .models import Post, Comment
@@ -25,10 +27,13 @@ def create(request):
             "form":form
         })
 
-
+@login_required
 def list(request):
+    # 1. 내가 팔로우한 사람들의 포스트만 보여줌.
+    # 2. 내가 작성한 post도 보여줌.
     # Show all the posts.
-    posts = Post.objects.all().order_by('-created')
+    
+    posts = Post.objects.filter(Q(user=request.user) | Q(user__in=request.user.followings.all()) ).order_by('-created')
     
     context = {
         'posts':posts,
