@@ -182,7 +182,11 @@
     <div class="col-xl-3 m-0">
       <div class="personal_info container-fluid">
         <div class="row mt-4">
-          <img src="{{user.profile.image.url}}" height="150" width="150" style="border-radius:50%"></img>
+          {% if user.profile.image %}
+            <img src="{{user.profile.image.url}}" height="150" width="150" style="border-radius:50%"></img>
+          {% else %}
+            <img src="{% static 'accounts/img/default_user.png' %}" height="150" width="150" style="border-radius:50%"></img>
+          {% endif %}
         </div>
         <div class="row mt-2">
           {{user.username}}
