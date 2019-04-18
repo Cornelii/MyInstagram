@@ -3,7 +3,7 @@
 {% load bootstrap4 %}
 
 {% block body %}
-<form method="POST", enctype="multipart/form-data">
+<form method="POST" enctype="multipart/form-data">
   <!-- 파일을 보낼 땐, enctype = "multipart/form-data" 추가해야 함.-->
   {% csrf_token %}
   <!--model form-->

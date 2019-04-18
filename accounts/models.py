@@ -7,6 +7,7 @@ class Profile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     description = models.TextField()
     nickname = models.CharField(max_length=20)
+    image = models.ImageField(blank=True)
     
 
 class User(AbstractUser):

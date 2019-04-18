@@ -69,14 +69,15 @@ def signup(request):
 def people(request, username):
     
     people = get_object_or_404(get_user_model(), username=username)
+    profile = get_object_or_404(Profile, user=people)
     # 1. settings.AUTH_USER_MODEL (django.conf)
     # 2. get_user_model() (django.contrib.auth)  ## recommended~!
     # 사용 지양할 것. ### 3. User (django.contrib.auth.models.User) ### 안쓰는게 좋음.
     comment_form = CommentModelForm()
     return render(request, 'accounts/people.html', {
         'people':people,
-        'comment_form':comment_form
-        
+        'comment_form':comment_form,
+        'profile':profile
     })
 
 
@@ -84,9 +85,8 @@ def people(request, username):
 def update(request):
     if request.method == "POST":
         user_change_form = CustomUserChangeForm(request.POST, instance=request.user)
+        profile_form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
         
-        profile_form = ProfileForm(request.POST, instance=request.user.profile)
-
         if user_change_form.is_valid() and profile_form.is_valid():
             user = user_change_form.save()
             profile_form.save()
@@ -146,6 +146,4 @@ def follow(request, user_id):
         request.user.followings.add(followed)
         
     return redirect('people', followed.username)
-    
-    
     
