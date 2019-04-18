@@ -13,9 +13,74 @@
     <div class="col-8">
       {% for post in posts %}
             <div class="card m-2" style="width: 40rem;">
-                <div class="card-header d-flex justify-content-between">
-                  <strong><a href="{% url 'people' post.user.username %}">{{ post.user.username }}</a></strong>
-                  <a href="#"><i class="fas fa-ellipsis-h"></i></a>
+                <div class="card-header">
+                  <div class="container-fluid">
+                    <div class="row">
+                      <div class="col-11 p-0">
+                        {% if post.user.profile.image %}
+                          <img src="{{post.user.profile.image.url}}" height="30" width="30" style="border-radius:50%"></img>
+                        {% else %}
+                          <img src="{% static 'accounts/img/default_user.png' %}" height="30" width="30" style="border-radius:50%"></img>
+                        {% endif %}
+                        <strong><a href="{% url 'people' post.user.username %}">{{ post.user.username }}</a></strong>
+                      </div>
+                      <div class="col-1 p-0 d-flex justify-content-end align-items-center">
+                        <i class="fas fa-ellipsis-h" data-toggle="modal" data-target="#post_update{{post.id}}"></i>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  
+                  
+                  <!-- Modal at header  -->
+                  <div class="modal fade" id="post_update{{post.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-body p-0">
+                          <div class="container-fluid p-0">
+                            <div class="row p-0 justify-content-center align-items-center">
+                              
+                              <div class="btn" style='color:red;'>부적절한 컨텐츠 신고</div>
+                              
+                            </div>
+                            <hr>
+                            <div class="row p-0 justify-content-center align-items-center">
+                              
+                              <div class="btn" style='color:red'>팔로우 취소</div>
+                              
+                            </div>
+                            <hr>
+                            <div class="row p-0 justify-content-center align-items-center">
+                              
+                              <div class="btn">게시물로 이동</div>
+                              
+                            </div>
+                            <hr>
+                            <div class="row p-0 justify-content-center align-items-center">
+                              
+                              <div class="btn">링크 복사</div>
+                              
+                            </div>
+                            <hr>
+                            <div class="row p-0 justify-content-center align-items-center">
+                              
+                              <div class="btn">공유하기</div>
+                              
+                            </div>
+                            <hr>
+                            <div class="row p-0 justify-content-center align-items-center">
+                              
+                              <div class="btn">취소</div>
+                              
+                            </div>
+
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  
                 </div>
                 
                 {% if post.image %}
@@ -97,7 +162,7 @@
                       {% bootstrap_form comment_form  %}
                     </div>
                     <div class="col-2">
-                      <div type='submit' class="btn btn-primary">게시</div>
+                      <button type='submit' class="btn btn-primary">게시</button>
                     </div>
                   </div>
                 </form>
@@ -115,16 +180,16 @@
     
     <!-- User List  -->
     <div class="col-xl-3 m-0">
-      <div class="personal_info">
-        <div class="row">
-          <div class="col-3">
-            <i class="far fa-user-circle"></i>
-          </div>
-          <div class="col-4">
-            {{user.username}}
-            {{user.profile.nickname}}
-          </div>
+      <div class="personal_info container-fluid">
+        <div class="row mt-4">
+          <img src="{{user.profile.image.url}}" height="150" width="150" style="border-radius:50%"></img>
         </div>
+        <div class="row mt-2">
+          {{user.username}}
+          {{user.profile.nickname}}
+        </div>
+          
+        
         <div class="row personal_info_content">
           <div class="title">스토리</div>
           
